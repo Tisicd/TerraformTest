@@ -62,13 +62,22 @@ resource "aws_security_group" "frontend_sg" {
   description = "Security Group del ASG de frontend"
   vpc_id      = data.aws_vpc.existing.id
 
-  # HTTP 80 desde el ALB
+  # SSH desde Internet
   ingress {
-    description     = "HTTP 80 desde ALB"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    description = "SSH desde Internet"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP 80 desde Internet
+  ingress {
+    description = "HTTP 80 desde Internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Outbound all (incluye tráfico hacia el backend en 3000)
@@ -95,13 +104,22 @@ resource "aws_security_group" "backend_sg" {
   description = "Security Group del ASG de backend"
   vpc_id      = data.aws_vpc.existing.id
 
-  # HTTP 3000 desde el SG de frontend
+  # SSH desde Internet
   ingress {
-    description     = "HTTP 3000 desde frontend"
-    from_port       = 3000
-    to_port         = 3000
-    protocol        = "tcp"
-    security_groups = [aws_security_group.frontend_sg.id]
+    description = "SSH desde Internet"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP 3000 desde Internet
+  ingress {
+    description = "HTTP 3000 desde Internet"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Outbound all
