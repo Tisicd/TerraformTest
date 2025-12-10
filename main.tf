@@ -17,8 +17,9 @@ provider "aws" {
 ## VPC Y SUBREDES EXISTENTES
 ########################
 
-# Nota: Usamos directamente var.vpc_id en lugar de un data source
-# para evitar requerir el permiso ec2:DescribeVpcs
+data "aws_vpc" "existing" {
+  id = var.vpc_id
+}
 
 ########################
 ## GRUPOS DE SEGURIDAD (3 SG: ALB, FRONTEND, BACKEND)
@@ -28,7 +29,7 @@ provider "aws" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security Group del ALB de frontend"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.existing.id
 
   ingress {
     description = "HTTP 80 desde Internet"
@@ -59,24 +60,15 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "frontend_sg" {
   name        = "${var.project_name}-frontend-sg"
   description = "Security Group del ASG de frontend"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.existing.id
 
-  # SSH desde Internet
+  # HTTP 80 desde el ALB
   ingress {
-    description = "SSH desde Internet"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP 80 desde Internet
-  ingress {
-    description = "HTTP 80 desde Internet"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "HTTP 80 desde ALB"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
   # Outbound all (incluye tráfico hacia el backend en 3000)
@@ -101,24 +93,15 @@ resource "aws_security_group" "frontend_sg" {
 resource "aws_security_group" "backend_sg" {
   name        = "${var.project_name}-backend-sg"
   description = "Security Group del ASG de backend"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.existing.id
 
-  # SSH desde Internet
+  # HTTP 3000 desde el SG de frontend
   ingress {
-    description = "SSH desde Internet"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP 3000 desde Internet
-  ingress {
-    description = "HTTP 3000 desde Internet"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "HTTP 3000 desde frontend"
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.frontend_sg.id]
   }
 
   # Outbound all
@@ -166,7 +149,7 @@ resource "aws_lb_target_group" "frontend_tg" {
   name        = "${var.project_name}-frontend-tg"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.existing.id
   target_type = "instance"
 
   health_check {

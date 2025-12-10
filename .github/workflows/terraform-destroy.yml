@@ -1,17 +1,11 @@
-name: Terraform AWS
+name: Terraform Destroy
 
 on:
-  # Lanzar manualmente desde la UI de GitHub
+  # Solo se puede ejecutar manualmente desde la UI de GitHub
   workflow_dispatch:
-  # (Opcional) También al hacer push a main y cambiar archivos .tf
-  push:
-    branches: [ main ]
-    paths:
-      - '**.tf'
-      - '.github/workflows/terraform-aws.yml'
 
 jobs:
-  terraform:
+  terraform-destroy:
     runs-on: ubuntu-latest
     env:
       TF_IN_AUTOMATION: "true"
@@ -31,16 +25,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1 # <-- ajusta a la región que uses en aws_region
+          aws-region: us-east-1
 
       - name: Terraform Init
         run: terraform init -input=false
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan -input=false
-
-      # Por seguridad, solo hacemos apply en ejecuciones manuales (workflow_dispatch)
-      - name: Terraform Apply
-        if: github.event_name == 'workflow_dispatch'
-        run: terraform apply -auto-approve tfplan
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -input=false
 
