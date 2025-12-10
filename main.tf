@@ -418,8 +418,8 @@ resource "aws_autoscaling_policy" "frontend_req_count" {
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      # resource_label = app/load-balancer-name/xxx/targetgroup/target-group-name/yyy
-      resource_label = "${aws_lb.frontend_alb.name}/${aws_lb_target_group.frontend_tg.name}"
+      # Formato requerido: app/<alb-name>/<id>/targetgroup/<tg-name>/<id>
+      resource_label = "${aws_lb.frontend_alb.arn_suffix}/${aws_lb_target_group.frontend_tg.arn_suffix}"
     }
     # Número objetivo de requests por instancia (ajústalo según tus pruebas)
     target_value = 100.0
