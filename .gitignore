@@ -1,0 +1,27 @@
+# === Terraform ===
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars.backup
+*.tfvars.json
+
+# Opcional: ignora archivos de override locales
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# No ignores .terraform.lock.hcl para poder fijar versiones de providers
+
+# === IDE / SO ===
+.DS_Store
+.vscode/
+.idea/
+*.iml
+
+# Logs genéricos
+*.log
+
+

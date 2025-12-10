@@ -1,0 +1,48 @@
+name: Terraform AWS
+
+on:
+  # Lanzar manualmente desde la UI de GitHub
+  workflow_dispatch:
+  # (Opcional) También al hacer push a main y cambiar archivos .tf
+  push:
+    branches: [ main ]
+    paths:
+      - '**.tf'
+      - '.github/workflows/terraform-aws.yml'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Configure AWS credentials (con session token)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1 # <-- ajusta a la región que uses en aws_region
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
+
+      # Por seguridad, solo hacemos apply en ejecuciones manuales (workflow_dispatch)
+      - name: Terraform Apply
+        if: github.event_name == 'workflow_dispatch'
+        run: terraform apply -auto-approve tfplan
+
+
+
