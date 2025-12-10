@@ -21,10 +21,6 @@ data "aws_vpc" "existing" {
   id = var.vpc_id
 }
 
-data "aws_subnets" "public" {
-  ids = var.public_subnet_ids
-}
-
 ########################
 ## GRUPOS DE SEGURIDAD (3 SG: ALB, FRONTEND, BACKEND)
 ########################
@@ -135,7 +131,7 @@ resource "aws_lb" "frontend_alb" {
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = data.aws_subnets.public.ids
+  subnets            = var.public_subnet_ids
 
   enable_deletion_protection = false
 
@@ -437,7 +433,7 @@ resource "aws_autoscaling_policy" "frontend_req_count" {
 resource "aws_eip" "extra_eip" {
   count = var.eip_count
 
-  vpc = true
+  domain = "vpc"
 
   # No los asociamos automáticamente para no romper ASG ni otros recursos.
   # Puedes usarlos luego para NAT Gateways o instancias específicas.
