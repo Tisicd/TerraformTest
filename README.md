@@ -58,7 +58,6 @@ public_subnet_ids = [
   "subnet-0a5b1725667fa6852",
   "subnet-0059fd9437a91eb87",
   "subnet-095053c3cfa0b3f24",
-  "subnet-0162e7f7f88043345",
   "subnet-091bc5279c696c6cf"
 ]
 

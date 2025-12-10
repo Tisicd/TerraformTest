@@ -10,7 +10,6 @@ public_subnet_ids = [
   "subnet-0a5b1725667fa6852",
   "subnet-0059fd9437a91eb87",
   "subnet-095053c3cfa0b3f24",
-  "subnet-0162e7f7f88043345",
   "subnet-091bc5279c696c6cf"
 ]
 
@@ -18,7 +17,7 @@ public_subnet_ids = [
 ami_id = "ami-068c0051b15cdb816" 
 
 # Tipo de instancia para los Auto Scaling Groups
-instance_type = "t2.micro"
+instance_type = "t3.micro"
 
 # Máximo de instancias por ASG (requisito del curso: 10)
 max_instances = 10

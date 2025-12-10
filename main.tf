@@ -17,9 +17,8 @@ provider "aws" {
 ## VPC Y SUBREDES EXISTENTES
 ########################
 
-data "aws_vpc" "existing" {
-  id = var.vpc_id
-}
+# Nota: Usamos directamente var.vpc_id en lugar de un data source
+# para evitar requerir el permiso ec2:DescribeVpcs
 
 ########################
 ## GRUPOS DE SEGURIDAD (3 SG: ALB, FRONTEND, BACKEND)
@@ -29,7 +28,7 @@ data "aws_vpc" "existing" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security Group del ALB de frontend"
-  vpc_id      = data.aws_vpc.existing.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "HTTP 80 desde Internet"
@@ -60,7 +59,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "frontend_sg" {
   name        = "${var.project_name}-frontend-sg"
   description = "Security Group del ASG de frontend"
-  vpc_id      = data.aws_vpc.existing.id
+  vpc_id      = var.vpc_id
 
   # SSH desde Internet
   ingress {
@@ -102,7 +101,7 @@ resource "aws_security_group" "frontend_sg" {
 resource "aws_security_group" "backend_sg" {
   name        = "${var.project_name}-backend-sg"
   description = "Security Group del ASG de backend"
-  vpc_id      = data.aws_vpc.existing.id
+  vpc_id      = var.vpc_id
 
   # SSH desde Internet
   ingress {
@@ -167,7 +166,7 @@ resource "aws_lb_target_group" "frontend_tg" {
   name        = "${var.project_name}-frontend-tg"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.existing.id
+  vpc_id      = var.vpc_id
   target_type = "instance"
 
   health_check {

@@ -34,7 +34,7 @@ variable "ami_id" {
 variable "instance_type" {
   description = "Tipo de instancia EC2 para los ASG"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "ssh_key_name" {
