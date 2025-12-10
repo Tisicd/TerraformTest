@@ -20,5 +20,5 @@ sleep 10
 # Añadir el usuario ec2-user al grupo docker para poder ejecutar comandos docker sin sudo
 sudo usermod -a -G docker ec2-user
 
-# Backend escuchando en 3000
-sudo docker run -d --restart always -p 3000:3000 ${docker_image_backend}
+# Backend escuchando en 4000 internamente, mapeado al puerto 3000 externo
+sudo docker run -d --restart always -p 3000:4000 ${docker_image_backend}
