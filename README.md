@@ -36,7 +36,10 @@ Características principales:
 ├─ main.tf                 # Definición principal de la infraestructura (SG, ALB, LT, ASG, políticas)
 ├─ variables.tf            # Definición de variables de entrada
 ├─ outputs.tf              # Salidas principales (DNS del ALB y nombres de ASG)
-├─ terraform.tfvars        # Valores concretos para tu cuenta AWS (vpc, subnets, AMI, imágenes Docker, etc.)
+├─ terraform.tfvars        # Valores por defecto (dev)
+├─ terraform.tfvars.dev    # Configuración para ambiente de desarrollo
+├─ terraform.tfvars.qa     # Configuración para ambiente de QA
+├─ terraform.tfvars.prod   # Configuración para ambiente de producción
 ├─ user-data-frontend.sh   # Script user-data para el Launch Template del frontend
 ├─ user-data-backend.sh    # Script user-data para el Launch Template del backend
 └─ .github/
@@ -75,6 +78,56 @@ eip_count = 0
 ```
 
 > **Importante:** No pongas **credenciales de AWS** (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`) en este archivo. Esas deben ir como **GitHub Secrets** si usas GitHub Actions.
+
+## Gestión de Ambientes (Dev, QA, Producción)
+
+El proyecto soporta múltiples ambientes mediante archivos `.tfvars` separados. Cada ambiente tiene su propia configuración:
+
+### Archivos de configuración por ambiente
+
+- **`terraform.tfvars`** o **`terraform.tfvars.dev`**: Ambiente de desarrollo (por defecto)
+- **`terraform.tfvars.qa`**: Ambiente de QA/Testing
+- **`terraform.tfvars.prod`**: Ambiente de producción
+
+### Diferencias entre ambientes
+
+| Característica | Dev | QA | Producción |
+|---------------|-----|-----|------------|
+| Tipo de instancia | t3.micro | t3.micro | t3.small |
+| Máximo de instancias | 10 | 10 | 20 |
+| Imágenes Docker | `:latest` | `:qa` | `:prod` |
+| Tags adicionales | Owner: student | Owner: qa-team | Owner: ops-team, Backup: required |
+
+### Cómo desplegar en cada ambiente
+
+#### Desarrollo (por defecto)
+```bash
+terraform init
+terraform plan
+terraform apply
+# O explícitamente:
+terraform apply -var-file="terraform.tfvars.dev"
+```
+
+#### QA
+```bash
+terraform init
+terraform plan -var-file="terraform.tfvars.qa"
+terraform apply -var-file="terraform.tfvars.qa"
+```
+
+#### Producción
+```bash
+terraform init
+terraform plan -var-file="terraform.tfvars.prod"
+terraform apply -var-file="terraform.tfvars.prod"
+```
+
+### Notas importantes
+
+- **Estado de Terraform**: Cada ambiente debería usar un backend de estado separado (por ejemplo, diferentes buckets S3) para evitar conflictos.
+- **Recursos únicos**: Los nombres de recursos incluyen el ambiente, pero si usas la misma VPC/subnets, asegúrate de que los nombres no colisionen.
+- **Validación**: La variable `environment` solo acepta valores: `dev`, `qa`, o `prod`.
 
 ## Cómo desplegar localmente
 

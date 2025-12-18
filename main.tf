@@ -51,7 +51,7 @@ resource "aws_security_group" "alb_sg" {
     {
       Name        = "${var.project_name}-alb-sg"
       Project     = var.project_name
-      Environment = "LoadTest"
+      Environment = var.environment
     }
   )
 }
@@ -102,7 +102,7 @@ resource "aws_security_group" "frontend_sg" {
     {
       Name        = "${var.project_name}-frontend-sg"
       Project     = var.project_name
-      Environment = "LoadTest"
+      Environment = var.environment
     }
   )
 }
@@ -144,7 +144,7 @@ resource "aws_security_group" "backend_sg" {
     {
       Name        = "${var.project_name}-backend-sg"
       Project     = var.project_name
-      Environment = "LoadTest"
+      Environment = var.environment
     }
   )
 }
@@ -167,7 +167,7 @@ resource "aws_lb" "frontend_alb" {
     {
       Name        = "${var.project_name}-frontend-alb"
       Project     = var.project_name
-      Environment = "LoadTest"
+      Environment = var.environment
     }
   )
 }
@@ -193,7 +193,7 @@ resource "aws_lb_target_group" "frontend_tg" {
     {
       Name        = "${var.project_name}-frontend-tg"
       Project     = var.project_name
-      Environment = "LoadTest"
+      Environment = var.environment
     }
   )
 }
@@ -242,7 +242,7 @@ resource "aws_launch_template" "frontend_lt" {
       {
         Name        = "${var.project_name}-frontend-ec2"
         Project     = var.project_name
-        Environment = "LoadTest"
+        Environment = var.environment
       }
     )
   }
@@ -280,7 +280,7 @@ resource "aws_launch_template" "backend_lt" {
       {
         Name        = "${var.project_name}-backend-ec2"
         Project     = var.project_name
-        Environment = "LoadTest"
+        Environment = var.environment
       }
     )
   }
@@ -327,7 +327,7 @@ resource "aws_autoscaling_group" "frontend_asg" {
 
   tag {
     key                 = "Environment"
-    value               = "LoadTest"
+    value               = var.environment
     propagate_at_launch = true
   }
 
@@ -368,7 +368,7 @@ resource "aws_autoscaling_group" "backend_asg" {
 
   tag {
     key                 = "Environment"
-    value               = "LoadTest"
+    value               = var.environment
     propagate_at_launch = true
   }
 

@@ -76,12 +76,22 @@ variable "eip_count" {
   }
 }
 
+variable "environment" {
+  description = "Ambiente de despliegue (dev, qa, prod)"
+  type        = string
+  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "qa", "prod"], var.environment)
+    error_message = "El ambiente debe ser: dev, qa o prod"
+  }
+}
+
 variable "common_tags" {
   description = "Mapa de tags comunes a aplicar a todos los recursos"
   type        = map(string)
   default = {
-    Environment = "dev"
-    ManagedBy   = "terraform"
+    ManagedBy = "terraform"
   }
 }
 

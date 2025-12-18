@@ -1,3 +1,8 @@
+# ============================================
+# CONFIGURACIÓN PARA AMBIENTE DE QA
+# ============================================
+# Uso: terraform apply -var-file="terraform.tfvars.qa"
+
 # Región donde tienes la VPC y las subnets
 aws_region = "us-east-1"
 
@@ -19,7 +24,7 @@ ami_id = "ami-068c0051b15cdb816"
 # Tipo de instancia para los Auto Scaling Groups
 instance_type = "t3.micro"
 
-# Máximo de instancias por ASG (requisito del curso: 10)
+# Máximo de instancias por ASG
 max_instances = 10
 
 # Nombre de la key pair SSH ya creada (opcional, deja vacío o comenta si no la usas)
@@ -28,21 +33,19 @@ ssh_key_name = "AWSkeys"
 # Nombre del Instance Profile IAM EXISTENTE (opcional, deja vacío o comenta si no lo usas)
 # instance_profile_name = ""
 
-# Imágenes Docker del frontend y backend
-docker_image_frontend = "letis/digimon-frontend:latest"
-docker_image_backend  = "letis/digimon-backend:latest"
+# Imágenes Docker del frontend y backend (usar tags específicos de QA)
+docker_image_frontend = "letis/digimon-frontend:qa"
+docker_image_backend  = "letis/digimon-backend:qa"
 
 # Número de Elastic IPs a reservar (0 por defecto para no consumir límite)
 eip_count = 0
 
 # Ambiente de despliegue
-environment = "dev"
+environment = "qa"
 
 # Tags comunes opcionales adicionales
 common_tags = {
-  Owner = "student"
+  Owner      = "qa-team"
+  CostCenter = "testing"
 }
-
-
-
 
