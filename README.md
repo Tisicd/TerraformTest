@@ -81,7 +81,7 @@ eip_count = 0
 
 ## Gestión de Ambientes (Dev, QA, Producción)
 
-El proyecto soporta múltiples ambientes mediante archivos `.tfvars` separados. Cada ambiente tiene su propia configuración:
+El proyecto soporta múltiples ambientes mediante **ramas de Git** y archivos `.tfvars` separados. Cada ambiente tiene su propia rama y configuración:
 
 ### Archivos de configuración por ambiente
 
@@ -98,29 +98,82 @@ El proyecto soporta múltiples ambientes mediante archivos `.tfvars` separados. 
 | Imágenes Docker | `:latest` | `:qa` | `:prod` |
 | Tags adicionales | Owner: student | Owner: qa-team | Owner: ops-team, Backup: required |
 
+### Estructura de ramas Git
+
+El proyecto utiliza ramas separadas para cada ambiente:
+
+- **`main`**: Rama principal (usa configuración de dev por defecto)
+- **`dev`**: Rama de desarrollo
+- **`qa`**: Rama de QA/Testing
+- **`prod`**: Rama de producción
+
+Cada rama tiene su archivo `terraform.tfvars` configurado automáticamente para su ambiente correspondiente.
+
 ### Cómo desplegar en cada ambiente
 
-#### Desarrollo (por defecto)
+#### Desarrollo
 ```bash
+# Cambiar a la rama de desarrollo
+git checkout dev
+
+# Desplegar (terraform.tfvars ya está configurado para dev)
 terraform init
 terraform plan
 terraform apply
-# O explícitamente:
-terraform apply -var-file="terraform.tfvars.dev"
 ```
 
 #### QA
 ```bash
+# Cambiar a la rama de QA
+git checkout qa
+
+# Desplegar (terraform.tfvars ya está configurado para qa)
 terraform init
-terraform plan -var-file="terraform.tfvars.qa"
-terraform apply -var-file="terraform.tfvars.qa"
+terraform plan
+terraform apply
 ```
 
 #### Producción
 ```bash
+# Cambiar a la rama de producción
+git checkout prod
+
+# Desplegar (terraform.tfvars ya está configurado para prod)
 terraform init
-terraform plan -var-file="terraform.tfvars.prod"
-terraform apply -var-file="terraform.tfvars.prod"
+terraform plan
+terraform apply
+```
+
+### Trabajar con las ramas
+
+#### Ver todas las ramas
+```bash
+git branch -a
+```
+
+#### Cambiar entre ramas
+```bash
+git checkout dev    # Cambiar a desarrollo
+git checkout qa     # Cambiar a QA
+git checkout prod   # Cambiar a producción
+```
+
+#### Subir las ramas al repositorio remoto
+```bash
+# Primera vez que subes cada rama
+git push -u origin dev
+git push -u origin qa
+git push -u origin prod
+
+# O subir todas las ramas locales
+git push --all origin
+```
+
+#### Crear una nueva rama desde main
+```bash
+git checkout main
+git pull origin main
+git checkout -b nueva-rama
 ```
 
 ### Notas importantes
